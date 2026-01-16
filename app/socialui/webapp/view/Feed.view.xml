@@ -56,6 +56,10 @@
             </HBox>
             <HBox justifyContent="End" class="sapUiSmallMarginTop" spacing="Small">
               <Button
+                icon="sap-icon://edit"
+                type="Transparent"
+                press=".onEditPost"/>
+              <Button
                 icon="sap-icon://delete"
                 type="Transparent"
                 press=".onDeletePost"/>

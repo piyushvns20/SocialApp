@@ -5,6 +5,7 @@
   <Dialog
     id="createPostDialog"
     title="Create Post"
+    afterOpen=".onDialogAfterOpen"
     draggable="true"
     resizable="true">
 
