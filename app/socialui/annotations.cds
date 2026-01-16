@@ -1,0 +1,1 @@
+using SocialService as service from '../../srv/social-service';

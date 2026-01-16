@@ -1,0 +1,71 @@
+<mvc:View
+  controllerName="socialui.controller.Feed"
+  xmlns="sap.m"
+  xmlns:mvc="sap.ui.core.mvc">
+
+  <Page title="Social Feed">
+    
+    <!-- Header Button -->
+    <headerContent>
+      <Button
+        text="Create Post"
+        icon="sap-icon://add"
+        press=".onCreatePost"/>
+    </headerContent>
+
+    <!-- Feed List -->
+    <content>
+      <List
+        id="postList"
+        items="{
+          path: '/Posts',
+          sorter: {
+            path: 'createdAt',
+            descending: true
+          }
+        }"
+        growing="true"
+        growingScrollToLoad="true">
+
+        <CustomListItem>
+          <VBox class="sapUiSmallMargin">
+            
+            <!-- Author -->
+            <Text
+              text="{author/name}"
+              class="sapUiSmallMarginBottom"
+              wrapping="false"
+              design="Bold"/>
+
+            <!-- Post Content -->
+            <Text
+              text="{content}"
+              wrapping="true"/>
+
+            <!-- Footer -->
+            <HBox
+              justifyContent="SpaceBetween"
+              class="sapUiSmallMarginTop">
+
+              <Text text="{createdAt}"/>
+
+              <Button
+                icon="sap-icon://like"
+                type="Transparent"
+                press=".onLike"/>
+            </HBox>
+            <HBox justifyContent="End" class="sapUiSmallMarginTop" spacing="Small">
+              <Button
+                icon="sap-icon://delete"
+                type="Transparent"
+                press=".onDeletePost"/>
+            </HBox>
+
+          </VBox>
+        </CustomListItem>
+
+      </List>
+    </content>
+
+  </Page>
+</mvc:View>
