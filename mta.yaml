@@ -3,115 +3,124 @@ ID: Social
 description: A simple CAP project.
 version: 1.0.0
 modules:
-- name: Social-srv
-  type: nodejs
-  path: gen/srv
-  requires:
-  - name: Social-db
-  provides:
-  - name: srv-api
-    properties:
-      srv-url: ${default-url}
-  parameters:
-    buildpack: nodejs_buildpack
-    instances: 1
-  build-parameters:
-    builder: npm-ci
-- name: Social-db-deployer
-  type: hdb
-  path: gen/db
-  requires:
-  - name: Social-db
-  parameters:
-    buildpack: nodejs_buildpack
-- name: Social-app-content
-  type: com.sap.application.content
-  path: .
-  requires:
-  - name: Social-repo-host
-    parameters:
-      content-target: true
-  build-parameters:
-    build-result: resources
+  - name: Social-srv
+    type: nodejs
+    path: gen/srv
     requires:
-    - artifacts:
-      - socialui.zip
-      name: socialui
-      target-path: resources/
-- name: socialui
-  type: html5
-  path: app/socialui
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
-- name: Social-destination-content
-  type: com.sap.application.content
-  requires:
-  - name: Social-destination-service
+      - name: Social-db
+      - name: uaa_Social
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
     parameters:
-      content-target: true
-  - name: Social-repo-host
+      buildpack: nodejs_buildpack
+      instances: 1
+    build-parameters:
+      builder: npm-ci
+  - name: Social-db-deployer
+    type: hdb
+    path: gen/db
+    requires:
+      - name: Social-db
     parameters:
-      service-key:
-        name: Social-repo-host-key
-  - name: uaa_Social
+      buildpack: nodejs_buildpack
+  - name: Social-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: Social-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - socialui.zip
+          name: socialui
+          target-path: resources/
+  - name: socialui
+    type: html5
+    path: app/socialui
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms:
+        []
+  - name: Social-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: Social-destination-service
+        parameters:
+          content-target: true
+      - name: Social-repo-host
+        parameters:
+          service-key:
+            name: Social-repo-host-key
+      - name: uaa_Social
+        parameters:
+          service-key:
+            name: uaa_Social-key
     parameters:
-      service-key:
-        name: uaa_Social-key
-  parameters:
-    content:
-      instance:
-        destinations:
-        - Name: socialapp_Social_repo_host
-          ServiceInstanceName: Social-html5-service
-          ServiceKeyName: Social-repo-host-key
-          sap.cloud.service: socialapp
-        - Authentication: OAuth2UserTokenExchange
-          Name: socialapp_uaa_Social
-          ServiceInstanceName: Social-xsuaa-service
-          ServiceKeyName: uaa_Social-key
-          sap.cloud.service: socialapp
-        existing_destinations_policy: ignore
-  build-parameters:
-    no-source: true
+      content:
+        instance:
+          destinations:
+            - Name: socialapp_Social_repo_host
+              ServiceInstanceName: Social-html5-service
+              ServiceKeyName: Social-repo-host-key
+              sap.cloud.service: socialapp
+            - Authentication: OAuth2UserTokenExchange
+              Name: socialapp_uaa_Social
+              ServiceInstanceName: Social-xsuaa-service
+              ServiceKeyName: uaa_Social-key
+              sap.cloud.service: socialapp
+          existing_destinations_policy: ignore
+    build-parameters:
+      no-source: true
 resources:
-- name: Social-db
-  type: com.sap.xs.hdi-container
-  parameters:
-    service: hana
-    service-plan: hdi-shared
-- name: Social-repo-host
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: html5-apps-repo
-    service-name: Social-html5-service
-    service-plan: app-host
-- name: Social-destination-service
-  type: org.cloudfoundry.managed-service
-  parameters:
-    config:
-      HTML5Runtime_enabled: true
-      version: 1.0.0
-    service: destination
-    service-name: Social-destination-service
-    service-plan: lite
-- name: uaa_Social
-  type: org.cloudfoundry.managed-service
-  parameters:
-    path: ./xs-security.json
-    service: xsuaa
-    service-name: Social-xsuaa-service
-    service-plan: application
+  - name: Social-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: Social-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: Social-html5-service
+      service-plan: app-host
+  - name: Social-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+      service: destination
+      service-name: Social-destination-service
+      service-plan: lite
+  - name: uaa_Social
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: Social-xsuaa-service
+      service-plan: application
+      config:
+        xsappname: Social-${org}-${space}
+        tenant-mode: dedicated
+        oauth2-configuration:
+          credential-types:
+            - "binding-secret"
+            - "x509"
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-  - builder: custom
-    commands:
-    - npm ci
-    - npx cds build --production
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production

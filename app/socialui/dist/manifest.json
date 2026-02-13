@@ -61,7 +61,7 @@
 		}
 	},
 	"sap.ui5": {
-		"flexEnabled": true,
+		"flexEnabled": false,
 		"dependencies": {
 			"minUI5Version": "1.143.2",
 			"libs": {
@@ -84,6 +84,7 @@
 				}
 			},
 			"": {
+				"type": "sap.ui.model.odata.v4.ODataModel",
 				"dataSource": "mainService",
 				"preload": true,
 				"settings": {
@@ -114,17 +115,14 @@
 			},
 			"routes": [
 				{
-					"name": "RouteView",
-					"pattern": ":?query:",
-					"target": [
-						"TargetView"
-					]
+					"name": "feed",
+					"pattern": "",
+					"target": "feed"
 				}
 			],
 			"targets": {
-				"TargetView": {
-					"id": "View",
-					"name": "View"
+				"feed": {
+					"viewName": "Feed"
 				}
 			}
 		},
